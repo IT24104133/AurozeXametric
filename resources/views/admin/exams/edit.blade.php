@@ -177,20 +177,6 @@
               </div>
 
               <div>
-                <label class="block text-sm font-extrabold text-slate-900 mb-2">MCQ Answer Count</label>
-                <select
-                  name="option_count"
-                  x-model.number="form.option_count"
-                  class="w-full rounded-2xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-4 focus:ring-indigo-100"
-                >
-                  <option :value="3">3 options (Grade 5)</option>
-                  <option :value="4">4 options (default)</option>
-                  <option :value="5">5 options</option>
-                </select>
-                <p class="text-xs text-slate-500 mt-2">Number of answer choices per MCQ question.</p>
-              </div>
-
-              <div>
                 <label class="block text-sm font-extrabold text-slate-900 mb-2">Question Limit</label>
                 <input
                   type="number"
@@ -327,7 +313,6 @@
           instructions: @js(old('instructions', $exam->instructions)),
           duration_minutes: Number(@js(old('duration_minutes', $exam->duration_minutes ?? 30))),
           question_mode: @js(old('question_mode', $exam->question_mode ?? 'ordered')),
-          option_count: Number(@js(old('option_count', $exam->option_count ?? 4))),
           question_limit: Number(@js(old('question_limit', $exam->question_limit ?? 40))),
           selection_mode: @js(old('selection_mode', $exam->selection_mode ?? 'all')),
 

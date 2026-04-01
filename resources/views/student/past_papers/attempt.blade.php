@@ -18,7 +18,7 @@
     .exam-attempt-page .exam-question-text,
     .exam-attempt-page .exam-option-text,
     .exam-attempt-page .exam-option-key {
-      font-size: 0.65rem !important;
+      font-size: 0.85rem !important;
       line-height: 1.5 !important;
     }
   </style>

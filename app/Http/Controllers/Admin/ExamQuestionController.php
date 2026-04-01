@@ -28,17 +28,12 @@ class ExamQuestionController extends Controller
     {
         $count = Question::where('exam_id', $exam->id)->count();
         $nextNumber = $count + 1;
-        $optionCount = $exam->option_count ?? 4; // Get exam's option count (default 4)
 
-        return view('admin.exams.questions.create', compact('exam', 'count', 'nextNumber', 'optionCount'));
+        return view('admin.exams.questions.create', compact('exam', 'count', 'nextNumber'));
     }
 
     public function store(Request $request, Exam $exam)
     {
-        // Get exam's option count (default 4 for backward compatibility)
-        $optionCount = $exam->option_count ?? 4;
-        $maxOptionIndex = $optionCount - 1;
-
         $validated = $request->validate([
             'question_text' => ['required', 'string'],
 
@@ -47,16 +42,13 @@ class ExamQuestionController extends Controller
             'image_2' => ['nullable', 'image', 'max:2048'],
             'image_3' => ['nullable', 'image', 'max:2048'],
 
-            // ✅ NEW: Dynamic option count based on exam setting (3, 4, or 5)
-            'options' => ['required', 'array', "size:$optionCount"],
+            // new dynamic options
+            'options' => ['required', 'array', 'min:4', 'max:5'],
             'options.*.option_text' => ['nullable', 'string'],
             'options.*.option_image' => ['nullable', 'image', 'max:2048'],
 
-            // ✅ which option is correct (0..optionCount-1)
-            'correct_index' => ['required', 'integer', 'min:0', "max:$maxOptionIndex"],
-        ], [
-            'options.size' => "You must provide exactly $optionCount options for this exam.",
-            'correct_index.max' => "Correct option index cannot exceed " . ($optionCount - 1) . ".",
+            // which option is correct (0..4)
+            'correct_index' => ['required', 'integer', 'min:0', 'max:4'],
         ]);
 
         $orderIndex = Question::where('exam_id', $exam->id)->count() + 1;

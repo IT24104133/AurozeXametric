@@ -198,20 +198,6 @@
                   <option value="manual">Manual</option>
                 </select>
               </div>
-
-              <div>
-                <label class="block text-sm font-extrabold text-slate-900 mb-1.5">MCQ Options Count</label>
-                <select
-                  name="option_count"
-                  x-model.number="form.option_count"
-                  class="w-full rounded-xl border border-slate-200 px-4 py-2.5 focus:outline-none focus:ring-4 focus:ring-indigo-100"
-                >
-                  <option :value="3">3 options (Grade 5)</option>
-                  <option :value="4">4 options (default)</option>
-                  <option :value="5">5 options</option>
-                </select>
-                <p class="text-xs text-slate-500 mt-1">Number of answer choices per question.</p>
-              </div>
             </div>
 
             <div class="mt-3 rounded-xl border border-slate-200 p-3">
@@ -336,7 +322,6 @@
         instructions: '',
         duration_minutes: 30,
         question_mode: 'ordered',
-        option_count: 4,
         question_limit: 40,
         selection_mode: 'all',
 
@@ -362,7 +347,6 @@
           instructions: '',
           duration_minutes: 30,
           question_mode: 'ordered',
-          option_count: 4,
           question_limit: 40,
           selection_mode: 'all',
           custom_success_popup_enabled: false,

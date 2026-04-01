@@ -15,24 +15,6 @@ use Illuminate\Support\Facades\Validator;
 
 class StudentAttemptController extends Controller
 {
-    private function postSubmitRedirect(ExamAttempt $attempt): array
-    {
-        $exam = $attempt->exam;
-        $published = (bool) ($exam->results_published ?? false);
-
-        if ($published) {
-            return [
-                'url' => route('student.exams.result', ['exam' => $attempt->exam_id, 'attempt' => $attempt->id]),
-                'flash' => null,
-            ];
-        }
-
-        return [
-            'url' => route('student.dashboard'),
-            'flash' => 'Exam submitted. Results will be available once published.',
-        ];
-    }
-
     /**
      * ✅ Server-side safety net:
      * Auto-submit if attempt is expired but still "in_progress".
@@ -126,11 +108,10 @@ class StudentAttemptController extends Controller
         $attempt->refresh();
 
         if (in_array($attempt->status, ['submitted', 'auto_submitted'], true)) {
-            $redirect = $this->postSubmitRedirect($attempt);
             return response()->json([
                 'ok' => false,
                 'message' => 'This attempt is already submitted.',
-                'redirect' => $redirect['url'],
+                'redirect' => route('student.exams.result', ['exam' => $attempt->exam_id, 'attempt' => $attempt->id]),
             ], 403);
         }
 
@@ -177,12 +158,11 @@ class StudentAttemptController extends Controller
         $attempt->refresh();
 
         if (in_array($attempt->status, ['submitted', 'auto_submitted'], true)) {
-            $redirect = $this->postSubmitRedirect($attempt);
             return response()->json([
                 'ok' => false,
                 'message' => 'This attempt is already submitted.',
                 'status' => $attempt->status,
-                'redirect' => $redirect['url'],
+                'redirect' => route('student.exams.result', ['exam' => $attempt->exam_id, 'attempt' => $attempt->id]),
             ], 403);
         }
 
@@ -256,12 +236,11 @@ class StudentAttemptController extends Controller
 
         // ✅ lock if already submitted
         if (in_array($attempt->status, ['submitted', 'auto_submitted'], true)) {
-            $redirect = $this->postSubmitRedirect($attempt);
             return response()->json([
                 'ok' => false,
                 'message' => 'This attempt is already submitted.',
                 'status' => $attempt->status,
-                'redirect' => $redirect['url'],
+                'redirect' => route('student.exams.result', ['exam' => $attempt->exam_id, 'attempt' => $attempt->id]),
             ], 403);
         }
 
@@ -344,12 +323,11 @@ class StudentAttemptController extends Controller
 
     // if already submitted (either manual or auto), stop
     if (in_array($attempt->status, ['submitted', 'auto_submitted'], true)) {
-        $redirect = $this->postSubmitRedirect($attempt);
         return response()->json([
             'ok' => false,
             'message' => 'This attempt is already submitted.',
             'status' => $attempt->status,
-            'redirect' => $redirect['url'],
+            'redirect' => route('student.exams.result', ['exam' => $attempt->exam_id, 'attempt' => $attempt->id]),
         ], 403);
     }
 
@@ -449,14 +427,9 @@ class StudentAttemptController extends Controller
         }
     }
 
-    $redirect = $this->postSubmitRedirect($attempt);
-    if (!empty($redirect['flash'])) {
-        session()->flash('success', $redirect['flash']);
-    }
-
     return response()->json([
         'ok' => true,
-        'redirect' => $redirect['url'],
+        'redirect' => route('student.exams.index'),
         'popup' => [
             'title' => $popupTitle,
             'message' => $popupMessage,

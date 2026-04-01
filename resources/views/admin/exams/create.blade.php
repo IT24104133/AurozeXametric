@@ -4,24 +4,6 @@
 <div class="max-w-3xl mx-auto p-6">
   <h1 class="text-2xl font-bold mb-4">Create Exam</h1>
 
-  {{-- Error Display --}}
-  @if($errors->any())
-    <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-      <h3 class="font-bold text-red-800 mb-2">⚠️ Error Creating Exam:</h3>
-      <ul class="list-disc list-inside text-red-700">
-        @foreach($errors->all() as $error)
-          <li>{{ $error }}</li>
-        @endforeach
-      </ul>
-    </div>
-  @endif
-
-  @if(session('error'))
-    <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-      <p class="text-red-700">{{ session('error') }}</p>
-    </div>
-  @endif
-
   <form method="POST" action="{{ route('admin.exams.store') }}">
     @csrf
 
@@ -45,16 +27,6 @@
       <option value="ordered" @selected(old('question_mode')==='ordered')>Ordered</option>
       <option value="shuffled" @selected(old('question_mode')==='shuffled')>Shuffled</option>
     </select>
-
-    <label class="block mb-2">MCQ Answer Count (Options per Question)</label>
-    <select name="option_count" id="optionCountSelect" class="w-full border p-2 mb-4">
-      <option value="3" @selected(old('option_count')==='3')>3 options (Grade 5)</option>
-      <option value="4" @selected(old('option_count', 4)==4)>4 options (default)</option>
-      <option value="5" @selected(old('option_count')==='5')>5 options</option>
-    </select>
-    <p class="text-sm text-gray-600 mb-4">
-      Select how many answer options each MCQ question will have. Grade 5 typically uses 3 options.
-    </p>
 
     <hr class="my-4">
 
@@ -136,21 +108,4 @@
     <button class="px-5 py-2 bg-black text-white rounded">Create</button>
   </form>
 </div>
-
-<script>
-// BONUS: Auto-set option count to 3 if "Grade 5" is detected in title
-document.addEventListener('DOMContentLoaded', () => {
-  const titleInput = document.querySelector('input[name="title"]');
-  const optionCountSelect = document.getElementById('optionCountSelect');
-  
-  if (titleInput && optionCountSelect) {
-    titleInput.addEventListener('input', () => {
-      const title = titleInput.value.toLowerCase();
-      if (title.includes('grade 5') || title.includes('grade5') || title.includes('class 5')) {
-        optionCountSelect.value = '3';
-      }
-    });
-  }
-});
-</script>
 @endsection
