@@ -87,10 +87,11 @@
         {{-- Options header --}}
         <div style="display:flex; gap:12px; align-items:center; margin-bottom:12px;">
             <div style="flex:1;">
-                <label><b>Number of Options (fixed by exam setting)</b></label><br>
-                <div style="padding:8px; background:#f0f9ff; border:1px solid #0284c7; border-radius:8px; color:#0c4a6e;">
-                    <strong>{{ $optionCount }} Options</strong> (configured for this exam)
-                </div>
+                <label><b>Number of Options</b></label><br>
+                <select id="optionCountSelect" style="padding:8px; width:180px;">
+                    <option value="4" selected>4 Options</option>
+                    <option value="5">5 Options</option>
+                </select>
                 <div style="font-size:12px; color:#666; margin-top:6px;">
                     Tip: Each option must have <b>text</b> or an <b>image</b> (or both).
                 </div>
@@ -104,9 +105,6 @@
 
         {{-- Hidden correct_index --}}
         <input type="hidden" name="correct_index" id="correct_index" value="{{ old('correct_index', 0) }}">
-        
-        {{-- Hidden option_count for JS --}}
-        <input type="hidden" id="optionCountValue" value="{{ $optionCount }}">
 
         {{-- Options container --}}
         <div id="optionsWrap"></div>
@@ -126,14 +124,16 @@
 <script>
 (function () {
     const wrap = document.getElementById('optionsWrap');
-    const optionCountValue = document.getElementById('optionCountValue');
+    const optionCountSelect = document.getElementById('optionCountSelect');
     const correctIndexInput = document.getElementById('correct_index');
 
     const keys = ['A', 'B', 'C', 'D', 'E'];
 
-    // Get option count from exam setting (passed from controller)
-    let count = parseInt(optionCountValue.value, 10);
+    // Default: 4 options
+    let count = 4;
 
+    // If user previously submitted 5 options and got validation errors,
+    // you can restore manually by changing dropdown again (simple).
     function renderOptions() {
         wrap.innerHTML = '';
 
@@ -185,7 +185,11 @@
         });
     }
 
-    // Render options immediately
+    optionCountSelect.addEventListener('change', () => {
+        count = parseInt(optionCountSelect.value, 10);
+        renderOptions();
+    });
+
     renderOptions();
 })();
 </script>

@@ -31,19 +31,6 @@
 
 @section('content')
 <div class="mb-6">
-  {{-- Success/Error Messages --}}
-  @if(session('success'))
-    <div class="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-      <p class="text-green-700 font-medium">✓ {{ session('success') }}</p>
-    </div>
-  @endif
-
-  @if(session('error'))
-    <div class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-      <p class="text-red-700 font-medium">✗ {{ session('error') }}</p>
-    </div>
-  @endif
-
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
     <h1 class="text-2xl font-extrabold text-slate-900">All Exams</h1>
 

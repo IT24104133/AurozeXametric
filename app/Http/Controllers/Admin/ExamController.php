@@ -20,13 +20,6 @@ class ExamController extends Controller
             ])
             ->orderByDesc('id')
             ->get();
-
-        \Log::info('📊 Exam Index Page Loaded', [
-            'total_exams' => $exams->count(),
-            'sql' => Exam::toBase()->toSql(),
-            'exam_ids' => $exams->pluck('id')->toArray(),
-        ]);
-
         return view('admin.exams.index', compact('exams'));
     }
 
@@ -37,11 +30,6 @@ class ExamController extends Controller
 
     public function store(Request $request)
     {
-        \Log::info('📝 Exam Create Form Submitted', [
-            'user_id' => auth()->id(),
-            'payload' => $request->except(['_token'])
-        ]);
-
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'teacher_name' => 'nullable|string|max:255',
@@ -52,9 +40,6 @@ class ExamController extends Controller
 
             // Order inside the selected question set
             'question_mode' => 'required|in:ordered,shuffled',
-            
-            // ✅ NEW: MCQ option count
-            'option_count' => 'required|integer|in:3,4,5',
 
             // pool selection settings
             'question_limit' => 'nullable|integer|min:1',
@@ -66,12 +51,9 @@ class ExamController extends Controller
             'custom_success_popup_link' => 'nullable|string|max:2048',
         ]);
 
-        \Log::info('✓ Validation passed');
-
         // Defaults (if not sent)
         $data['question_limit'] = $data['question_limit'] ?? 40;
         $data['selection_mode'] = $data['selection_mode'] ?? 'all';
-        $data['option_count'] = $data['option_count'] ?? 4; // Default to 4 options
 
         // ✅ checkbox booleans
         $data['custom_success_popup_enabled'] = $request->boolean('custom_success_popup_enabled');
@@ -98,33 +80,15 @@ class ExamController extends Controller
         // Auto-generate exam UID
         $data['exam_uid'] = $this->generateExamUid();
 
-        try {
-            $exam = Exam::create(array_merge($data, [
-                'status' => 'draft',
-                'created_by' => auth()->id(),
-                'results_published' => false,
-            ]));
+        Exam::create([
+            ...$data,
+            'status' => 'draft',
+            'created_by' => auth()->id(),
+            'results_published' => false,
+        ]);
 
-            \Log::info('✓ Exam created successfully', [
-                'exam_id' => $exam->id,
-                'title' => $exam->title,
-                'exam_code' => $exam->exam_code,
-                'exam_uid' => $exam->exam_uid,
-            ]);
-
-            return redirect()->route('admin.exams.index')
-                ->with('success', 'Exam created successfully (Draft)');
-        } catch (\Exception $e) {
-            \Log::error('✗ Failed to create exam', [
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-            ]);
-
-            return back()
-                ->withInput()
-                ->withErrors(['error' => 'Failed to create exam: ' . $e->getMessage()]);
-        }
+        return redirect()->route('admin.exams.index')
+            ->with('success', 'Exam created (Draft)');
     }
 
     public function edit(Exam $exam)
@@ -144,9 +108,6 @@ class ExamController extends Controller
 
             // Order inside the selected question set
             'question_mode' => 'required|in:ordered,shuffled',
-            
-            // ✅ NEW: MCQ option count
-            'option_count' => 'required|integer|in:3,4,5',
 
             // pool selection settings
             'question_limit' => 'nullable|integer|min:1',
@@ -160,7 +121,6 @@ class ExamController extends Controller
 
         $data['question_limit'] = $data['question_limit'] ?? 40;
         $data['selection_mode'] = $data['selection_mode'] ?? 'all';
-        $data['option_count'] = $data['option_count'] ?? 4; // Default to 4 options
 
         // ✅ checkbox booleans
         $data['custom_success_popup_enabled'] = $request->boolean('custom_success_popup_enabled');

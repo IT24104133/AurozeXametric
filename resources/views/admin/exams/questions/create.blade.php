@@ -19,7 +19,7 @@
         Total: {{ $count }} / {{ $exam->question_limit ?? 40 }}
       </p>
       <p class="text-xs text-slate-500 mt-1">
-        Each question has <strong>{{ $optionCount }} options</strong> (configured for this exam). Each option can have text, image, or both.
+        Options can be 4 or 5. Each option can have text, image, or both.
       </p>
     </div>
 
@@ -102,15 +102,15 @@
         </p>
       </div>
 
-      {{-- Option count display (readonly, based on exam setting) --}}
+      {{-- Option count selector --}}
       <div class="border rounded p-4">
         <div class="flex items-center justify-between gap-4 flex-wrap">
           <div>
-            <label class="block font-semibold mb-2">Number of Options (configured for this exam)</label>
-            <div style="padding:10px; background:#f0f9ff; border:1px solid #0284c7; border-radius:8px; color:#0c4a6e;">
-              <strong>{{ $optionCount }} Options</strong> (fixed by exam setting)
-            </div>
-            <input type="hidden" id="optionCountValue" value="{{ $optionCount }}">
+            <label class="block font-semibold mb-1">Number of Options</label>
+            <select id="optionCount" class="border p-2 rounded w-48">
+              <option value="4" selected>4 Options</option>
+              <option value="5">5 Options</option>
+            </select>
           </div>
 
           <div class="text-sm text-gray-600">
@@ -138,12 +138,11 @@
 <script>
 (function(){
   const keys = ['A','B','C','D','E'];
-  const optionCountEl = document.getElementById('optionCountValue');
+  const optionCountEl = document.getElementById('optionCount');
   const wrap = document.getElementById('optionsWrap');
   const correctIndexEl = document.getElementById('correct_index');
 
-  // Read option count from exam setting (passed from controller via hidden input)
-  let count = parseInt(optionCountEl.value, 10) || 4;
+  let count = 4;
 
   function render(){
     wrap.innerHTML = '';
@@ -200,7 +199,11 @@
     });
   }
 
-  // Render options immediately based on exam setting
+  optionCountEl.addEventListener('change', () => {
+    count = parseInt(optionCountEl.value, 10);
+    render();
+  });
+
   render();
 })();
 </script>

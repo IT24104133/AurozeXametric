@@ -22,18 +22,12 @@ class QuestionController extends Controller
     public function create(Exam $exam)
     {
         $nextPos = ($exam->questions()->max('position') ?? 0) + 1;
-        $optionCount = $exam->option_count ?? 4; // Default to 4 if not set (backward compatibility)
-        
-        return view('admin.questions.create', compact('exam', 'nextPos', 'optionCount'));
+        return view('admin.questions.create', compact('exam', 'nextPos'));
     }
 
     public function store(Request $request, Exam $exam)
     {
-        // Get exam's option count (default 4 for backward compatibility)
-        $optionCount = $exam->option_count ?? 4;
-        $maxOptionIndex = $optionCount - 1;
-
-        // ✅ Validate: dynamic option count based on exam setting
+        // ✅ Validate: 4 or 5 options + exactly 1 correct + images
         $validated = $request->validate([
             'position' => ['required', 'integer', 'min:1'],
             'question_text' => ['required', 'string'],
@@ -43,18 +37,15 @@ class QuestionController extends Controller
             'image_2' => ['nullable', 'image', 'max:4096'],
             'image_3' => ['nullable', 'image', 'max:4096'],
 
-            // options array - must match exam's option_count
-            'options' => ['required', 'array', "size:$optionCount"],
+            // options array
+            'options' => ['required', 'array', 'min:4', 'max:5'],
             'options.*.option_text' => ['nullable', 'string', 'max:255'],
             'options.*.option_image' => ['nullable', 'image', 'max:4096'],
 
-            // index of correct option (0..optionCount-1)
-            'correct_index' => ['required', 'integer', 'min:0', "max:$maxOptionIndex"],
+            // index of correct option (0..4)
+            'correct_index' => ['required', 'integer', 'min:0', 'max:4'],
 
             'explanation' => ['nullable', 'string'],
-        ], [
-            'options.size' => "You must provide exactly $optionCount options for this exam.",
-            'correct_index.max' => "Correct answer must be between 1 and $optionCount.",
         ]);
 
         // Extra rule: each option must have text OR image (at least one)
@@ -72,7 +63,7 @@ class QuestionController extends Controller
         $optionCount = count($validated['options']);
         if ((int)$validated['correct_index'] > ($optionCount - 1)) {
             return back()
-                ->withErrors(['correct_index' => "Correct option must be between 1 and $optionCount for this exam."])
+                ->withErrors(['correct_index' => 'Correct option is invalid for selected option count.'])
                 ->withInput();
         }
 
@@ -99,7 +90,7 @@ class QuestionController extends Controller
 
             $question->save();
 
-            // 2) Create options (3, 4, or 5 based on exam setting)
+            // 2) Create options (4 or 5)
             foreach ($validated['options'] as $index => $opt) {
                 $option = new QuestionOption();
                 $option->question_id = $question->id;
@@ -133,10 +124,6 @@ class QuestionController extends Controller
     {
         abort_unless($question->exam_id === $exam->id, 404);
 
-        // Get exam's option count (default 4 for backward compatibility)
-        $optionCount = $exam->option_count ?? 4;
-        $maxOptionIndex = $optionCount - 1;
-
         $validated = $request->validate([
             'position' => ['required', 'integer', 'min:1'],
             'question_text' => ['required', 'string'],
@@ -145,16 +132,13 @@ class QuestionController extends Controller
             'image_2' => ['nullable', 'image', 'max:4096'],
             'image_3' => ['nullable', 'image', 'max:4096'],
 
-            'options' => ['required', 'array', "size:$optionCount"],
+            'options' => ['required', 'array', 'min:4', 'max:5'],
             'options.*.id' => ['nullable', 'integer'], // existing option id (if editing)
             'options.*.option_text' => ['nullable', 'string', 'max:255'],
             'options.*.option_image' => ['nullable', 'image', 'max:4096'],
 
-            'correct_index' => ['required', 'integer', 'min:0', "max:$maxOptionIndex"],
+            'correct_index' => ['required', 'integer', 'min:0', 'max:4'],
             'explanation' => ['nullable', 'string'],
-        ], [
-            'options.size' => "You must provide exactly $optionCount options for this exam.",
-            'correct_index.max' => "Correct answer must be between 1 and $optionCount.",
         ]);
 
         foreach ($validated['options'] as $i => $opt) {
@@ -170,7 +154,7 @@ class QuestionController extends Controller
         $optionCount = count($validated['options']);
         if ((int)$validated['correct_index'] > ($optionCount - 1)) {
             return back()
-                ->withErrors(['correct_index' => "Correct option must be between 1 and $optionCount for this exam."])
+                ->withErrors(['correct_index' => 'Correct option is invalid for selected option count.'])
                 ->withInput();
         }
 

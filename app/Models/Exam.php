@@ -18,7 +18,6 @@ class Exam extends Model
         // ✅ NEW: question pool settings
         'question_limit',      // e.g. 40
         'selection_mode',      // all | first_n | random_n | manual
-        'option_count',        // 3, 4, or 5 (MCQ answer count)
 
         // existing
         'starts_at',
@@ -47,7 +46,6 @@ class Exam extends Model
         'ends_at' => 'datetime',
         'results_published' => 'boolean',
         'question_limit' => 'integer',
-        'option_count' => 'integer',
     ];
 
     public function questions()

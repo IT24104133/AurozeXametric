@@ -207,63 +207,6 @@
     </div>
 </section>
 
-<!-- SECTION: PARTNER LOGOS MARQUEE -->
-<section class="py-6 lg:py-8 bg-gradient-to-r from-teal-500/15 via-emerald-400/10 to-cyan-400/15 border-y border-slate-200">
-    <div class="max-w-7xl mx-auto px-6 lg:px-8">
-        <!-- Heading -->
-        <h3 class="text-xs lg:text-sm font-bold text-slate-500 uppercase tracking-widest mb-6 text-center">
-            Trusted by Our Partners
-        </h3>
-
-        <!-- Unified Marquee (All Devices) -->
-        <div class="marquee-container">
-            <div class="marquee-track">
-                <!-- Logo Set 1 (Original) -->
-                <div class="partner-logo" style="width: 140px; height: 90px;">
-                    <img src="{{ asset('images/partners/arouze.png') }}" alt="Arouze">
-                </div>
-                <div class="partner-logo" style="width: 140px; height: 90px;">
-                    <img src="{{ asset('images/partners/Eduvia_help.png') }}" alt="Eduvia Help">
-                </div>
-                <div class="partner-logo" style="width: 140px; height: 90px;">
-                    <img src="{{ asset('images/partners/Eduvia.png') }}" alt="Eduvia">
-                </div>
-                <div class="partner-logo" style="width: 140px; height: 90px;">
-                    <img src="{{ asset('images/partners/kalvi-books.png') }}" alt="Kalvi Books">
-                </div>
-                <div class="partner-logo" style="width: 140px; height: 90px;">
-                    <img src="{{ asset('images/partners/kalvi.png') }}" alt="Kalvi">
-                </div>
-                <div class="partner-logo" style="width: 140px; height: 90px;">
-                    <img src="{{ asset('images/partners/mpowerr.png') }}" alt="Mpowerr">
-                </div>
-               
-
-                <!-- Logo Set 2 (Duplicate for seamless loop) -->
-                <div class="partner-logo" style="width: 140px; height: 90px;">
-                    <img src="{{ asset('images/partners/arouze.png') }}" alt="Arouze">
-                </div>
-                <div class="partner-logo" style="width: 140px; height: 90px;">
-                    <img src="{{ asset('images/partners/Eduvia_help.png') }}" alt="Eduvia Help">
-                </div>
-                <div class="partner-logo" style="width: 140px; height: 90px;">
-                    <img src="{{ asset('images/partners/Eduvia.png') }}" alt="Eduvia">
-                </div>
-                <div class="partner-logo" style="width: 140px; height: 90px;">
-                    <img src="{{ asset('images/partners/kalvi-books.png') }}" alt="Kalvi Books">
-                </div>
-                <div class="partner-logo" style="width: 140px; height: 90px;">
-                    <img src="{{ asset('images/partners/kalvi.png') }}" alt="Kalvi">
-                </div>
-                <div class="partner-logo" style="width: 140px; height: 90px;">
-                    <img src="{{ asset('images/partners/mpowerr.png') }}" alt="Mpowerr">
-                </div>
-               
-            </div>
-        </div>
-    </div>
-</section>
-
 <!-- SECTION: MCQ IMPORTANCE (Split Hero Style) -->
 <section class="relative py-16 lg:py-24 overflow-hidden">
     <!-- Gradient Background -->

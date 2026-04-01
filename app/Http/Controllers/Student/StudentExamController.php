@@ -14,23 +14,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class StudentExamController extends Controller
 {
-    private function postSubmitRedirect(Exam $exam, ExamAttempt $attempt): array
-    {
-        $published = (bool) ($exam->results_published ?? false);
-
-        if ($published) {
-            return [
-                'url' => route('student.exams.result', ['exam' => $exam->id, 'attempt' => $attempt->id]),
-                'flash' => null,
-            ];
-        }
-
-        return [
-            'url' => route('student.dashboard'),
-            'flash' => 'Exam submitted. Results will be available once published.',
-        ];
-    }
-
     public function index(Request $request)
     {
         $userId = Auth::id();
@@ -158,12 +141,8 @@ class StudentExamController extends Controller
             $latestAttempt->save();
 
             // ✅ After timeout, do NOT start new attempt
-            $redirect = $this->postSubmitRedirect($exam, $latestAttempt);
-            $response = redirect()->to($redirect['url']);
-            if (!empty($redirect['flash'])) {
-                $response->with('success', $redirect['flash']);
-            }
-            return $response;
+            return redirect()->route('student.exams.index')
+                ->with('success', 'Time is over. Your exam was auto-submitted.');
         }
 
         // ✅ Not expired -> continue attempt
@@ -242,23 +221,15 @@ class StudentExamController extends Controller
 
         // Block if submitted or auto-submitted - redirect to dashboard
         if (in_array($attempt->status, ['submitted', 'auto_submitted'], true)) {
-            $redirect = $this->postSubmitRedirect($exam, $attempt);
-            $response = redirect()->to($redirect['url']);
-            if (!empty($redirect['flash'])) {
-                $response->with('success', $redirect['flash']);
-            }
-            return $response;
+            return redirect()->route('student.dashboard')
+                ->with('info', 'This attempt is already submitted.');
         }
 
         // Auto-submit when time is over
         if ($attempt->ends_at && now()->greaterThanOrEqualTo($attempt->ends_at)) {
             $this->finalizeAttempt($attempt, true);
-            $redirect = $this->postSubmitRedirect($exam, $attempt);
-            $response = redirect()->to($redirect['url']);
-            if (!empty($redirect['flash'])) {
-                $response->with('success', $redirect['flash']);
-            }
-            return $response;
+            return redirect()->route('student.exams.result', ['exam' => $exam->id, 'attempt' => $attempt->id])
+                ->with('info', 'This attempt is already submitted.');
         }
 
         $remaining = $attempt->ends_at ? now()->diffInSeconds($attempt->ends_at, false) : 0;
@@ -373,12 +344,8 @@ class StudentExamController extends Controller
 
         // Block if submitted or auto-submitted - redirect to dashboard
         if (in_array($attempt->status, ['submitted', 'auto_submitted'], true)) {
-            $redirect = $this->postSubmitRedirect($exam, $attempt);
-            $response = redirect()->to($redirect['url']);
-            if (!empty($redirect['flash'])) {
-                $response->with('success', $redirect['flash']);
-            }
-            return $response;
+            return redirect()->route('student.dashboard')
+                ->with('info', 'This attempt has already been submitted.');
         }
 
         $this->saveAnswers($request, $attempt);
@@ -390,12 +357,8 @@ class StudentExamController extends Controller
 
         $this->finalizeAttempt($attempt, $auto);
 
-        $redirect = $this->postSubmitRedirect($exam, $attempt);
-        $response = redirect()->to($redirect['url']);
-        if (!empty($redirect['flash'])) {
-            $response->with('success', $redirect['flash']);
-        }
-        return $response;
+        return redirect()->route('student.exams.index')
+            ->with('success', 'Your exam was submitted. Please wait until results are published.');
     }
 
     public function result(Exam $exam, ExamAttempt $attempt)
